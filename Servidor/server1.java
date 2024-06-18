@@ -11,7 +11,6 @@ public class server1 {
         clients = new ArrayList<>();
         try {
             serverSocket = new ServerSocket(port);
-            // Obter o endereço IP da máquina local
             InetAddress localAddress = InetAddress.getLocalHost();
             System.out.println("Servidor iniciado em " + localAddress.getHostAddress() + ":" + port);
 
@@ -19,11 +18,10 @@ public class server1 {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Usuário conectou: " + clientSocket);
 
-                // Criar um novo handler para o cliente
+                // responsável por gerenciar a comunicação com um usuário/client específico.
                 ClientHandler handler = new ClientHandler(clientSocket);
                 clients.add(handler);
 
-                // Iniciar uma thread para o cliente
                 Thread clientThread = new Thread(handler);
                 clientThread.start();
             }
@@ -38,7 +36,7 @@ public class server1 {
         }
     }
 
-    // Classe interna para lidar com cada cliente
+    // classe responsável para lidar com o usuário
     class ClientHandler implements Runnable {
         private Socket clientSocket;
         private BufferedReader input;
@@ -88,16 +86,16 @@ public class server1 {
             }
         }
 
-        // Método para enviar mensagem para todos os clientes
+        // método q envia a mensagem para todos
         public void broadcastMessage(String message) {
             for (ClientHandler client : clients) {
                 client.output.println(clientAddress + ": " + message);
             }
         }
 
-        // Método para lidar com mensagens privadas
+        // tratar mensagens privadas
         private void handlePrivateMessage(String message) {
-            String[] parts = message.split("\\s+", 3); // Divide a mensagem em partes (comando, IP_destino, mensagem)
+            String[] parts = message.split("\\s+", 3); 
             if (parts.length >= 3) {
                 String ipAddress = parts[1];
                 String privateMessage = parts[2];
@@ -107,7 +105,7 @@ public class server1 {
             }
         }
 
-        // Método para enviar mensagem privada para um cliente específico
+        // método para enviar mensagem privada para um usuário específico
         private void sendPrivateMessage(String ipAddress, String message) {
             for (ClientHandler client : clients) {
                 if (client.clientAddress.equals(ipAddress)) {
@@ -115,7 +113,7 @@ public class server1 {
                     return;
                 }
             }
-            // Caso o IP_destino não seja encontrado
+          
             output.println("Cliente não encontrado para o IP especificado: " + ipAddress);
         }
     }
